@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt
 
-stratus = cv.imread('stratus1.jpg')
+stratus = cv.imread('dataset/stratus1.jpg')
 
 # Convert to grayscale
 gray_stratus = cv.cvtColor(stratus, cv.COLOR_BGR2GRAY)
@@ -16,24 +16,7 @@ kernel = np.ones((5, 5), np.uint8)
 cleaned = cv.morphologyEx(otsu_thresholded, cv.MORPH_OPEN, kernel)   # remove specks
 cleaned = cv.morphologyEx(cleaned, cv.MORPH_CLOSE, kernel)           # fill holes
 
-# ─── IoU SCORING ────────────────────────────────────────────────
-def compute_iou(pred, true):
-    pred = pred > 127
-    true = true > 127
-    intersection = np.logical_and(pred, true).sum()
-    union = np.logical_or(pred, true).sum()
-    return intersection / union
-
-# Load the ground truth mask (adjust filename to match your SWIMSEG file)
-true_mask = cv.imread('stratus1.jpg', cv.IMREAD_GRAYSCALE)
-
-if true_mask is None:
-    print("⚠ Ground truth file not found — skipping IoU. Check the filename/path.")
-else:
-    iou = compute_iou(cleaned, true_mask)
-    print(f"IoU score: {iou:.3f}")
-# ────────────────────────────────────────────────────────────────
-
+# ─── HISTOGRAM OF PIXEL INTENSITIES ─────────────────────────────
 plt.hist(gray_stratus.ravel(), 256)
 plt.title('Histogram of pixel intensities')
 plt.xlabel('Pixel intensity')
